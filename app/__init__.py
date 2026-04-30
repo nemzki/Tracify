@@ -4,6 +4,8 @@ import config
 #IMPPORT DB
 from extensions import db
 
+from .models import user, visitor, visitor_log, task
+
 def create_app():
     # Initialize app
     app = Flask(__name__)
