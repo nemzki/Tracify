@@ -4,33 +4,117 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tracify — Visitor Monitoring System</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="{{ url_for('static', filename='landing.css') }}">
 </head>
 <body>
 
+  <div class="bg-grid"></div>
+  <div class="orb1"></div>
+  <div class="orb2"></div>
+
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="scan-line"></div>
+
   <main class="hero">
+
+    <!-- Logo mark -->
+    <div class="logo-wrap">
+      <svg class="logo-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Tracify logo mark">
+        <defs>
+          <radialGradient id="pinGrad" cx="38%" cy="22%" r="70%">
+            <stop offset="0%" stop-color="#4d8fff"/>
+            <stop offset="100%" stop-color="#0028cc"/>
+          </radialGradient>
+          <radialGradient id="faceGrad" cx="40%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ddeeff"/>
+            <stop offset="100%" stop-color="#aaccff"/>
+          </radialGradient>
+          <radialGradient id="glowRad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1a6fff" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#1a6fff" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="glow">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="faceClip">
+            <circle cx="80" cy="52" r="27"/>
+          </clipPath>
+        </defs>
+
+        <!-- outer glow disc -->
+        <ellipse cx="80" cy="80" rx="68" ry="68" fill="url(#glowRad)"/>
+
+        <!-- radar rings at base -->
+        <ellipse cx="80" cy="132" rx="16" ry="5" fill="none" stroke="#0066ff" stroke-width="1.2" opacity="0.55"/>
+        <ellipse cx="80" cy="132" rx="26" ry="8" fill="none" stroke="#0066ff" stroke-width="0.8" opacity="0.3"/>
+        <ellipse cx="80" cy="132" rx="38" ry="11" fill="none" stroke="#00aaff" stroke-width="0.6" opacity="0.15"/>
+
+        <!-- animated pulse ring -->
+        <circle cx="80" cy="132" r="16" fill="none" stroke="#00ccff" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" values="16;36;16" dur="3.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.45;0.0;0.45" dur="3.5s" repeatCount="indefinite"/>
+        </circle>
+
+        <!-- pin shadow -->
+        <ellipse cx="80" cy="133" rx="22" ry="6" fill="#001a88" opacity="0.3" filter="url(#glow)"/>
+
+        <!-- pin body -->
+        <path d="M80 14 C57 14 38 33 38 56 C38 87 80 130 80 130 C80 130 122 87 122 56 C122 33 103 14 80 14 Z" fill="url(#pinGrad)"/>
+
+        <!-- pin left highlight -->
+        <path d="M52 26 C40 38 36 52 38 64 C39 52 44 36 58 26 Z" fill="white" opacity="0.12"/>
+
+        <!-- face circle -->
+        <circle cx="80" cy="52" r="28" fill="url(#faceGrad)"/>
+        <circle cx="80" cy="52" r="28" fill="none" stroke="rgba(0,180,255,0.25)" stroke-width="1"/>
+
+        <!-- person icon clipped inside face circle -->
+        <g clip-path="url(#faceClip)">
+          <circle cx="80" cy="44" r="10" fill="#1448e8"/>
+          <path d="M56 80 Q56 62 67 57 Q73 54 80 54 Q87 54 93 57 Q104 62 104 80 Z" fill="#1448e8"/>
+        </g>
+
+        <!-- cyan tracking arc -->
+        <path d="M80 24 A28 28 0 0 1 106 40" fill="none" stroke="#00d4ff" stroke-width="4.5" stroke-linecap="round" filter="url(#glow)"/>
+        <path d="M106 40 A28 28 0 0 1 108 52" fill="none" stroke="#00d4ff" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+
+        <!-- trail dots -->
+        <circle cx="114" cy="135" r="3.5" fill="#00ccff" opacity="0.7"/>
+        <circle cx="124" cy="137" r="2.6" fill="#00ccff" opacity="0.45"/>
+        <circle cx="133" cy="139" r="1.8" fill="#00ccff" opacity="0.25"/>
+      </svg>
+    </div>
+
     <div class="hero-eyebrow">Visitor Monitoring System</div>
-    <h1>
-      TRACI<span>FY</span>
+
+    <h1 class="wordmark">
+      <span class="wordmark-traci">TRACI</span><span class="wordmark-fy">FY</span>
+      <span class="wordmark-underline"></span>
     </h1>
-    <p class="hero-sub">Track. Monitor. Secure.</p>
+
+    <p class="hero-sub">Track<em>/</em>Monitor<em>/</em>Secure</p>
+
     <a href="{{ url_for('auth.login') }}" class="begin-btn">
       <span>Begin</span>
-      <span class="arrow">→</span>
+      <svg class="btn-icon" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M3.5 9H14.5M14.5 9L9.5 4M14.5 9L9.5 14" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
     </a>
-  </main>
 
-  <div class="status-bar">
-    <div class="status-item">
-      <div class="status-dot"></div>
-      System Online
+    <div class="status-row" role="status" aria-label="System status">
+      <div class="pill"><div class="dot dot-green"></div>System Online</div>
+      <div class="sep"></div>
+      <div class="pill"><div class="dot dot-cyan"></div>Secure Access</div>
+      <div class="sep"></div>
+      <div class="pill"><div class="dot dot-cyan"></div>Real-time Tracking</div>
     </div>
-    <div class="status-item">● Secure Access</div>
-    <div class="status-item">● Real-time Tracking</div>
-  </div>
+
+  </main>
 
 </body>
 </html>
