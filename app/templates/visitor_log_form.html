@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Log Visitor — Tracify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='forms.css') }}">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">TRACI<span>FY</span></div>
+    <p>Monitoring System</p>
+  </div>
+  <div class="sidebar-role">Security Personnel</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="{{ url_for('security.dashboard') }}">
+        <span class="nav-icon">⊞</span> Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.visitor_logs') }}">
+        <span class="nav-icon">📋</span> Visitor Logs
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.log_visitor') }}" class="active">
+        <span class="nav-icon">＋</span> Log Visitor
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.my_tasks') }}">
+        <span class="nav-icon">✓</span> My Tasks
+      </a>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <div class="user-info">
+        <div class="name">{{ current_user.username }}</div>
+        <div class="role-tag">Security Personnel</div>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Log Visitor</div>
+  </header>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>Visitor Entry Log</h2>
+        <p>Record visitor details and purpose of visit.</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('security.log_visitor') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="form-body">
+          <p style="font-size:0.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Visitor Information</p>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="first_name">First Name <span class="required">*</span></label>
+              {{ form.first_name(id='first_name', placeholder='Juan') }}
+              {% if form.first_name.errors %}
+                {% for e in form.first_name.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="last_name">Last Name <span class="required">*</span></label>
+              {{ form.last_name(id='last_name', placeholder='Dela Cruz') }}
+              {% if form.last_name.errors %}
+                {% for e in form.last_name.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+              {% endif %}
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="contact_number">Contact Number <span class="required">*</span></label>
+              {{ form.contact_number(id='contact_number', placeholder='09XXXXXXXXX') }}
+              {% if form.contact_number.errors %}
+                {% for e in form.contact_number.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+              {% endif %}
+            </div>
+            <div class="form-group">
+              <label for="email">Email <span style="font-size:.65rem;color:var(--muted)">(optional)</span></label>
+              {{ form.email(id='email', placeholder='visitor@email.com') }}
+              {% if form.email.errors %}
+                {% for e in form.email.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+              {% endif %}
+            </div>
+          </div>
+
+          <div style="height:1px;background:var(--border);margin:0.5rem 0 1.25rem"></div>
+          <p style="font-size:0.7rem;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:1rem">Visit Details</p>
+
+          <div class="form-group">
+            <label for="purpose_of_visit">Purpose of Visit <span class="required">*</span></label>
+            {{ form.purpose_of_visit(id='purpose_of_visit', placeholder='Describe the reason for this visit...') }}
+            {% if form.purpose_of_visit.errors %}
+              {% for e in form.purpose_of_visit.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+            {% endif %}
+          </div>
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn btn-primary">＋ Record Visitor</button>
+          <a href="{{ url_for('security.dashboard') }}" class="btn btn-ghost">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
