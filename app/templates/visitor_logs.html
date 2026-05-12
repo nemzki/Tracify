@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visitor Records — Tracify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='visitor_logs.css') }}">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">TRACI<span>FY</span></div>
+    <p>Monitoring System</p>
+  </div>
+  <div class="sidebar-role">{{ 'Administrator' if current_user.role == 'admin' else 'Security Personnel' }}</div>
+  <ul class="sidebar-nav">
+    {% if current_user.role == 'admin' %}
+    <li><a href="{{ url_for('admin.dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
+    <li><a href="{{ url_for('admin.visitors') }}" class="active"><span class="nav-icon">👤</span> Visitor Records</a></li>
+    <li><a href="{{ url_for('admin.personnel') }}"><span class="nav-icon">🛡</span> Personnel</a></li>
+    <li><a href="{{ url_for('admin.tasks') }}"><span class="nav-icon">✓</span> Tasks</a></li>
+    <li><a href="{{ url_for('admin.assign_task') }}"><span class="nav-icon">＋</span> Assign Task</a></li>
+    {% else %}
+    <li><a href="{{ url_for('security.dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
+    <li><a href="{{ url_for('security.visitor_logs') }}" class="active"><span class="nav-icon">📋</span> Visitor Logs</a></li>
+    <li><a href="{{ url_for('security.log_visitor') }}"><span class="nav-icon">＋</span> Log Visitor</a></li>
+    <li><a href="{{ url_for('security.my_tasks') }}"><span class="nav-icon">✓</span> My Tasks</a></li>
+    {% endif %}
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <div class="user-info">
+        <div class="name">{{ current_user.username }}</div>
+        <div class="role-tag">{{ 'Administrator' if current_user.role == 'admin' else 'Security Personnel' }}</div>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Visitor Records</div>
+    <form method="GET" style="display:flex;flex:1;max-width:380px;margin:0 auto;">
+      <div class="search-bar" style="width:100%">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="q" placeholder="Search by name, contact, purpose..." value="{{ query or '' }}">
+      </div>
+    </form>
+    {% if current_user.role == 'security' %}
+    <div class="topbar-actions">
+      <a href="{{ url_for('security.log_visitor') }}" class="btn btn-primary">＋ Log Visitor</a>
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="section-header">
+      <div class="section-title">
+        All Visitor Logs
+        {% if query %} — Results for "{{ query }}"{% endif %}
+      </div>
+      <span style="font-size:.75rem;color:var(--muted)">{{ logs|length }} record(s)</span>
+    </div>
+
+    <div class="table-wrap">
+      {% if logs %}
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Visitor Name</th>
+            <th>Contact</th>
+            <th>Email</th>
+            <th>Purpose</th>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Recorded By</th>
+            <th>Status</th>
+            {% if current_user.role == 'security' %}<th>Actions</th>{% endif %}
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in logs %}
+          <tr>
+            <td style="color:var(--muted)">{{ log.visitor_log_id }}</td>
+            <td>{{ log.visitor.first_name }} {{ log.visitor.last_name }}</td>
+            <td>{{ log.visitor.contact_number }}</td>
+            <td>{{ log.visitor.email or '—' }}</td>
+            <td>{{ log.purpose_of_visit[:40] }}{% if log.purpose_of_visit|length > 40 %}…{% endif %}</td>
+            <td>{{ log.time_in.strftime('%b %d, %H:%M') }}</td>
+            <td>{{ log.time_out.strftime('%b %d, %H:%M') if log.time_out else '—' }}</td>
+            <td>{{ log.user.username }}</td>
+            <td><span class="badge badge-{{ log.status }}">{{ log.status }}</span></td>
+            {% if current_user.role == 'security' %}
+            <td>
+              {% if log.status == 'active' %}
+              <form method="POST" action="{{ url_for('security.checkout_visitor', log_id=log.visitor_log_id) }}">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline btn-sm">Check Out</button>
+              </form>
+              {% endif %}
+            </td>
+            {% endif %}
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        {% if query %}No records matching "{{ query }}"{% else %}No visitor logs recorded yet{% endif %}
+      </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
