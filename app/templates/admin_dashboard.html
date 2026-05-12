@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard — Tracify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='admin.css') }}">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">TRACI<span>FY</span></div>
+    <p>Monitoring System</p>
+  </div>
+  <div class="sidebar-role">Administrator</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="{{ url_for('admin.dashboard') }}" class="{{ 'active' if request.endpoint == 'admin.dashboard' }}">
+        <span class="nav-icon">⊞</span> Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.visitors') }}" class="{{ 'active' if request.endpoint == 'admin.visitors' }}">
+        <span class="nav-icon">👤</span> Visitor Records
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.personnel') }}" class="{{ 'active' if request.endpoint == 'admin.personnel' }}">
+        <span class="nav-icon">🛡</span> Personnel
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.tasks') }}" class="{{ 'active' if request.endpoint == 'admin.tasks' }}">
+        <span class="nav-icon">✓</span> Tasks
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.assign_task') }}" class="{{ 'active' if request.endpoint == 'admin.assign_task' }}">
+        <span class="nav-icon">＋</span> Assign Task
+      </a>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <div class="user-info">
+        <div class="name">{{ current_user.username }}</div>
+        <div class="role-tag">Administrator</div>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Dashboard</div>
+    <form method="GET" action="{{ url_for('admin.visitors') }}" style="display:flex;flex:1;max-width:380px;margin:0 auto;">
+      <div class="search-bar" style="width:100%">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="q" placeholder="Search visitor, personnel..." value="{{ request.args.get('q','') }}">
+      </div>
+    </form>
+    <div class="topbar-actions">
+      <a href="{{ url_for('admin.assign_task') }}" class="btn btn-primary">＋ Assign Task</a>
+    </div>
+  </header>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- Stats -->
+    <div class="stats-grid">
+      <div class="stat-card" style="--card-color:#00e5ff">
+        <div class="stat-label">Total Visitors Today</div>
+        <div class="stat-value">{{ stats.visitors_today }}</div>
+        <div class="stat-sub">All-time: {{ stats.total_visitors }}</div>
+        <div class="stat-icon">👤</div>
+      </div>
+      <div class="stat-card" style="--card-color:#22c55e">
+        <div class="stat-label">Currently Inside</div>
+        <div class="stat-value">{{ stats.active_visitors }}</div>
+        <div class="stat-sub">Active check-ins</div>
+        <div class="stat-icon">🏢</div>
+      </div>
+      <div class="stat-card" style="--card-color:#7c3aed">
+        <div class="stat-label">Security Personnel</div>
+        <div class="stat-value">{{ stats.total_personnel }}</div>
+        <div class="stat-sub">Active staff</div>
+        <div class="stat-icon">🛡</div>
+      </div>
+      <div class="stat-card" style="--card-color:#f59e0b">
+        <div class="stat-label">Pending Tasks</div>
+        <div class="stat-value">{{ stats.pending_tasks }}</div>
+        <div class="stat-sub">Assigned: {{ stats.total_tasks }}</div>
+        <div class="stat-icon">✓</div>
+      </div>
+    </div>
+
+    <!-- 2-col: Recent logs + Personnel -->
+    <div class="grid-2">
+      <!-- Recent visitor logs -->
+      <div>
+        <div class="section-header">
+          <div class="section-title">Recent Visitor Logs</div>
+          <a href="{{ url_for('admin.visitors') }}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="table-wrap">
+          {% if recent_logs %}
+          <table>
+            <thead>
+              <tr>
+                <th>Visitor</th>
+                <th>Purpose</th>
+                <th>Time In</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for log in recent_logs %}
+              <tr>
+                <td>{{ log.visitor.first_name }} {{ log.visitor.last_name }}</td>
+                <td>{{ log.purpose_of_visit[:30] }}{% if log.purpose_of_visit|length > 30 %}…{% endif %}</td>
+                <td>{{ log.time_in.strftime('%H:%M') }}</td>
+                <td>
+                  <span class="badge badge-{{ log.status }}">{{ log.status }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">📋</div>
+            No visitor logs today
+          </div>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Personnel -->
+      <div>
+        <div class="section-header">
+          <div class="section-title">Security Personnel</div>
+          <a href="{{ url_for('admin.personnel') }}" class="btn btn-outline btn-sm">View All</a>
+        </div>
+        <div class="table-wrap" style="padding:1rem 1.5rem">
+          {% if personnel %}
+          <ul class="personnel-list">
+            {% for p in personnel %}
+            <li class="personnel-item">
+              <div class="avatar" style="background:linear-gradient(135deg,#22c55e,#00e5ff)">{{ p.username[0].upper() }}</div>
+              <div class="info">
+                <div class="name">{{ p.username }}</div>
+                <div class="email">{{ p.email }}</div>
+              </div>
+              <div class="task-count">{{ p.tasks|length }} tasks</div>
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <div class="empty-state">
+            <div class="empty-icon">🛡</div>
+            No security personnel
+          </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    <!-- All Tasks -->
+    <div class="section-header">
+      <div class="section-title">All Tasks</div>
+      <a href="{{ url_for('admin.assign_task') }}" class="btn btn-primary btn-sm">＋ New Task</a>
+    </div>
+    <div class="table-wrap">
+      {% if tasks %}
+      <table>
+        <thead>
+          <tr>
+            <th>Assigned To</th>
+            <th>Description</th>
+            <th>Created</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for task in tasks %}
+          <tr>
+            <td>{{ task.assigned_user.username }}</td>
+            <td>{{ task.task_description[:50] }}{% if task.task_description|length > 50 %}…{% endif %}</td>
+            <td>{{ task.created_at.strftime('%b %d, %Y') }}</td>
+            <td><span class="badge badge-{{ task.status }}">{{ task.status }}</span></td>
+            <td style="display:flex;gap:.5rem">
+              <a href="{{ url_for('admin.edit_task', task_id=task.task_id) }}" class="btn btn-outline btn-sm">Edit</a>
+              <form method="POST" action="{{ url_for('admin.delete_task', task_id=task.task_id) }}" style="display:inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-danger btn-sm" onclick="return confirm('Delete this task?')">Del</button>
+              </form>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">✓</div>
+        No tasks assigned yet
+      </div>
+      {% endif %}
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+</body>
+</html>
