@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Security Dashboard — Tracify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='security.css') }}">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">TRACI<span>FY</span></div>
+    <p>Monitoring System</p>
+  </div>
+  <div class="sidebar-role">Security Personnel</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="{{ url_for('security.dashboard') }}" class="{{ 'active' if request.endpoint == 'security.dashboard' }}">
+        <span class="nav-icon">⊞</span> Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.visitor_logs') }}" class="{{ 'active' if request.endpoint == 'security.visitor_logs' }}">
+        <span class="nav-icon">📋</span> Visitor Logs
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.log_visitor') }}" class="{{ 'active' if request.endpoint == 'security.log_visitor' }}">
+        <span class="nav-icon">＋</span> Log Visitor
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.my_tasks') }}" class="{{ 'active' if request.endpoint == 'security.my_tasks' }}">
+        <span class="nav-icon">✓</span> My Tasks
+        {% if pending_task_count %}
+          <span class="task-badge">{{ pending_task_count }}</span>
+        {% endif %}
+      </a>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <div class="user-info">
+        <div class="name">{{ current_user.username }}</div>
+        <div class="role-tag">Security Personnel</div>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">Security Dashboard</div>
+    <form method="GET" action="{{ url_for('security.visitor_logs') }}" style="display:flex;flex:1;max-width:380px;margin:0 auto;">
+      <div class="search-bar" style="width:100%">
+        <span class="search-icon">🔍</span>
+        <input type="text" name="q" placeholder="Search visitor records..." value="{{ request.args.get('q','') }}">
+      </div>
+    </form>
+    <div class="topbar-actions">
+      <a href="{{ url_for('security.log_visitor') }}" class="btn btn-primary">＋ Log Visitor</a>
+    </div>
+  </header>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <!-- My Tasks -->
+    <div class="section-header">
+      <div class="section-title">My Assigned Tasks</div>
+      <a href="{{ url_for('security.my_tasks') }}" class="btn btn-outline btn-sm">View All</a>
+    </div>
+
+    {% if my_tasks %}
+    <ul class="tasks-list">
+      {% for task in my_tasks[:3] %}
+      <li class="task-item status-{{ task.status }}">
+        <div class="task-meta">
+          <div class="task-desc">{{ task.task_description }}</div>
+          <div class="task-date">Assigned {{ task.created_at.strftime('%b %d, %Y') }}</div>
+        </div>
+        <div class="task-actions">
+          <span class="badge badge-{{ task.status }}">{{ task.status }}</span>
+          {% if task.status != 'done' %}
+          <form method="POST" action="{{ url_for('security.complete_task', task_id=task.task_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-success btn-sm">Mark Done</button>
+          </form>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state" style="background:var(--surface);border:1px solid var(--border);margin-bottom:2rem">
+      <div class="empty-icon">✓</div>
+      No tasks assigned to you
+    </div>
+    {% endif %}
+
+    <!-- Recent visitor logs -->
+    <div class="section-header">
+      <div class="section-title">Recent Visitor Logs</div>
+      <a href="{{ url_for('security.log_visitor') }}" class="btn btn-primary btn-sm">＋ New Log</a>
+    </div>
+    <div class="table-wrap">
+      {% if recent_logs %}
+      <table>
+        <thead>
+          <tr>
+            <th>Visitor Name</th>
+            <th>Contact</th>
+            <th>Purpose</th>
+            <th>Time In</th>
+            <th>Time Out</th>
+            <th>Status</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in recent_logs %}
+          <tr>
+            <td>{{ log.visitor.first_name }} {{ log.visitor.last_name }}</td>
+            <td>{{ log.visitor.contact_number }}</td>
+            <td>{{ log.purpose_of_visit[:30] }}{% if log.purpose_of_visit|length > 30 %}…{% endif %}</td>
+            <td>{{ log.time_in.strftime('%H:%M') }}</td>
+            <td>{{ log.time_out.strftime('%H:%M') if log.time_out else '—' }}</td>
+            <td><span class="badge badge-{{ log.status }}">{{ log.status }}</span></td>
+            <td>
+              {% if log.status == 'active' %}
+              <form method="POST" action="{{ url_for('security.checkout_visitor', log_id=log.visitor_log_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <button type="submit" class="btn btn-outline btn-sm">Check Out</button>
+              </form>
+              {% endif %}
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+      {% else %}
+      <div class="empty-state">
+        <div class="empty-icon">📋</div>
+        No visitor logs recorded yet
+      </div>
+      {% endif %}
+    </div>
+
+  </div>
+</div>
+
+</body>
+</html>
