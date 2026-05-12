@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>{{ 'Edit Task' if task else 'Assign Task' }} — Tracify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='forms.css') }}">
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">TRACI<span>FY</span></div>
+    <p>Monitoring System</p>
+  </div>
+  <div class="sidebar-role">Administrator</div>
+  <ul class="sidebar-nav">
+    <li>
+      <a href="{{ url_for('admin.dashboard') }}">
+        <span class="nav-icon">⊞</span> Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.visitors') }}">
+        <span class="nav-icon">👤</span> Visitor Records
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.personnel') }}">
+        <span class="nav-icon">🛡</span> Personnel
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.tasks') }}">
+        <span class="nav-icon">✓</span> Tasks
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.assign_task') }}" class="active">
+        <span class="nav-icon">＋</span> Assign Task
+      </a>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <div class="user-info">
+        <div class="name">{{ current_user.username }}</div>
+        <div class="role-tag">Administrator</div>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">{{ 'Edit Task' if task else 'Assign Task' }}</div>
+  </header>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="form-card">
+      <div class="form-card-header">
+        <h2>{{ 'Edit Task' if task else 'Assign New Task' }}</h2>
+        <p>{{ 'Update task details and assignment.' if task else 'Assign a task to a security personnel member.' }}</p>
+      </div>
+
+      <form method="POST" action="{{ url_for('admin.edit_task', task_id=task.task_id) if task else url_for('admin.assign_task') }}">
+        {{ form.hidden_tag() }}
+
+        <div class="form-body">
+          <div class="form-group">
+            <label for="assigned_to">Assign To <span class="required">*</span></label>
+            {{ form.assigned_to(id='assigned_to') }}
+            {% if form.assigned_to.errors %}
+              {% for e in form.assigned_to.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+            {% endif %}
+          </div>
+
+          <div class="form-group">
+            <label for="task_description">Task Description <span class="required">*</span></label>
+            {{ form.task_description(id='task_description', placeholder='Describe the task in detail...') }}
+            {% if form.task_description.errors %}
+              {% for e in form.task_description.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
+            {% endif %}
+          </div>
+
+          {% if task %}
+          <div class="form-group">
+            <label for="status">Status</label>
+            {{ form.status(id='status') }}
+          </div>
+          {% endif %}
+        </div>
+
+        <div class="form-footer">
+          <button type="submit" class="btn btn-primary">
+            {{ '✓ Update Task' if task else '＋ Assign Task' }}
+          </button>
+          <a href="{{ url_for('admin.tasks') }}" class="btn btn-ghost">Cancel</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
