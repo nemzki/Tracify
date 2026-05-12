@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Tasks — Tracify</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='security.css') }}">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-brand">
+    <div class="wordmark">TRACI<span>FY</span></div>
+    <p>Monitoring System</p>
+  </div>
+  <div class="sidebar-role">Security Personnel</div>
+  <ul class="sidebar-nav">
+    <li><a href="{{ url_for('security.dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
+    <li><a href="{{ url_for('security.visitor_logs') }}"><span class="nav-icon">📋</span> Visitor Logs</a></li>
+    <li><a href="{{ url_for('security.log_visitor') }}"><span class="nav-icon">＋</span> Log Visitor</a></li>
+    <li>
+      <a href="{{ url_for('security.my_tasks') }}" class="active">
+        <span class="nav-icon">✓</span> My Tasks
+        {% if pending_count %}<span class="task-badge">{{ pending_count }}</span>{% endif %}
+      </a>
+    </li>
+  </ul>
+  <div class="sidebar-footer">
+    <div class="user-chip">
+      <div class="avatar">{{ current_user.username[0].upper() }}</div>
+      <div class="user-info">
+        <div class="name">{{ current_user.username }}</div>
+        <div class="role-tag">Security Personnel</div>
+      </div>
+    </div>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+  </div>
+</aside>
+
+<div class="main">
+  <header class="topbar">
+    <div class="topbar-title">My Tasks</div>
+  </header>
+
+  <div class="content">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% for category, message in messages %}
+        <div class="flash flash-{{ category }}">{{ message }}</div>
+      {% endfor %}
+    {% endwith %}
+
+    <div class="section-header">
+      <div class="section-title">Assigned Tasks</div>
+      <span style="font-size:.75rem;color:var(--muted)">{{ tasks|length }} total</span>
+    </div>
+
+    {% if tasks %}
+    <ul class="tasks-list">
+      {% for task in tasks %}
+      <li class="task-item status-{{ task.status }}">
+        <div class="task-meta">
+          <div class="task-desc">{{ task.task_description }}</div>
+          <div class="task-date">Assigned on {{ task.created_at.strftime('%B %d, %Y at %H:%M') }}</div>
+        </div>
+        <div class="task-actions">
+          <span class="badge badge-{{ task.status }}">{{ task.status }}</span>
+          {% if task.status != 'done' %}
+          <form method="POST" action="{{ url_for('security.complete_task', task_id=task.task_id) }}">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <button type="submit" class="btn btn-success btn-sm">✓ Mark Done</button>
+          </form>
+          {% endif %}
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+    {% else %}
+    <div class="empty-state" style="background:var(--surface);border:1px solid var(--border)">
+      <div class="empty-icon">✓</div>
+      You have no tasks assigned
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+</body>
+</html>
