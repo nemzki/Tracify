@@ -11,12 +11,74 @@
 </head>
 <body>
 
+  <div class="bg-grid"></div>
+  <div class="orb1"></div>
+  <div class="orb2"></div>
+
+  <div class="corner corner-tl"></div>
+  <div class="corner corner-tr"></div>
+  <div class="corner corner-bl"></div>
+  <div class="corner corner-br"></div>
+
+  <div class="scan-line"></div>
+
   <div class="login-wrapper">
     <div class="login-card">
 
       <div class="login-brand">
+
+        <!-- Exact landing page logo mark -->
+        <div class="logo-mark">
+          <svg class="logo-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Tracify logo mark">
+            <defs>
+              <radialGradient id="lp-pinGrad" cx="38%" cy="22%" r="70%">
+                <stop offset="0%" stop-color="#4d8fff"/>
+                <stop offset="100%" stop-color="#0028cc"/>
+              </radialGradient>
+              <radialGradient id="lp-faceGrad" cx="40%" cy="30%" r="70%">
+                <stop offset="0%" stop-color="#ddeeff"/>
+                <stop offset="100%" stop-color="#aaccff"/>
+              </radialGradient>
+              <radialGradient id="lp-glowRad" cx="50%" cy="50%" r="50%">
+                <stop offset="0%" stop-color="#1a6fff" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#1a6fff" stop-opacity="0"/>
+              </radialGradient>
+              <filter id="lp-glow">
+                <feGaussianBlur stdDeviation="5" result="blur"/>
+                <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+              </filter>
+              <clipPath id="lp-faceClip">
+                <circle cx="80" cy="52" r="27"/>
+              </clipPath>
+            </defs>
+            <ellipse cx="80" cy="80" rx="68" ry="68" fill="url(#lp-glowRad)"/>
+            <ellipse cx="80" cy="132" rx="16" ry="5" fill="none" stroke="#0066ff" stroke-width="1.2" opacity="0.55"/>
+            <ellipse cx="80" cy="132" rx="26" ry="8" fill="none" stroke="#0066ff" stroke-width="0.8" opacity="0.3"/>
+            <ellipse cx="80" cy="132" rx="38" ry="11" fill="none" stroke="#00aaff" stroke-width="0.6" opacity="0.15"/>
+            <circle cx="80" cy="132" r="16" fill="none" stroke="#00ccff" stroke-width="1" opacity="0.4">
+              <animate attributeName="r" values="16;36;16" dur="3.5s" repeatCount="indefinite"/>
+              <animate attributeName="opacity" values="0.45;0.0;0.45" dur="3.5s" repeatCount="indefinite"/>
+            </circle>
+            <ellipse cx="80" cy="133" rx="22" ry="6" fill="#001a88" opacity="0.3" filter="url(#lp-glow)"/>
+            <path d="M80 14 C57 14 38 33 38 56 C38 87 80 130 80 130 C80 130 122 87 122 56 C122 33 103 14 80 14 Z" fill="url(#lp-pinGrad)"/>
+            <path d="M52 26 C40 38 36 52 38 64 C39 52 44 36 58 26 Z" fill="white" opacity="0.12"/>
+            <circle cx="80" cy="52" r="28" fill="url(#lp-faceGrad)"/>
+            <circle cx="80" cy="52" r="28" fill="none" stroke="rgba(0,180,255,0.25)" stroke-width="1"/>
+            <g clip-path="url(#lp-faceClip)">
+              <circle cx="80" cy="44" r="10" fill="#1448e8"/>
+              <path d="M56 80 Q56 62 67 57 Q73 54 80 54 Q87 54 93 57 Q104 62 104 80 Z" fill="#1448e8"/>
+            </g>
+            <path d="M80 24 A28 28 0 0 1 106 40" fill="none" stroke="#00d4ff" stroke-width="4.5" stroke-linecap="round" filter="url(#lp-glow)"/>
+            <path d="M106 40 A28 28 0 0 1 108 52" fill="none" stroke="#00d4ff" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+            <circle cx="114" cy="135" r="3.5" fill="#00ccff" opacity="0.7"/>
+            <circle cx="124" cy="137" r="2.6" fill="#00ccff" opacity="0.45"/>
+            <circle cx="133" cy="139" r="1.8" fill="#00ccff" opacity="0.25"/>
+          </svg>
+        </div>
+
         <div class="wordmark">TRACI<span>FY</span></div>
         <p>Visitor Monitoring System</p>
+        <div class="divider"></div>
       </div>
 
       {% with messages = get_flashed_messages(with_categories=true) %}
@@ -28,28 +90,81 @@
       <form method="POST" action="{{ url_for('auth.login') }}">
         {{ form.hidden_tag() }}
 
+        <!-- Username -->
         <div class="form-group">
           <label for="username">Username</label>
-          {{ form.username(id='username', placeholder='Enter your username') }}
+          <div class="input-wrap">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            </span>
+            {{ form.username(
+                id='username',
+                placeholder='Enter your username',
+                class='input-error' if form.username.errors else ''
+            ) }}
+          </div>
           {% if form.username.errors %}
             {% for e in form.username.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
           {% endif %}
         </div>
 
+        <!-- Password -->
         <div class="form-group">
           <label for="password">Password</label>
-          {{ form.password(id='password', placeholder='Enter your password') }}
+          <div class="input-wrap input-wrap--password">
+            <span class="input-icon">
+              <svg viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>
+            </span>
+            {{ form.password(
+                id='password',
+                placeholder='Enter your password',
+                class='input-error' if form.password.errors else ''
+            ) }}
+            <button type="button" class="toggle-password" id="togglePassword" aria-label="Show password">
+              <svg class="icon-eye" viewBox="0 0 24 24">
+                <path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                <circle cx="12" cy="12" r="3"/>
+              </svg>
+              <svg class="icon-eye-off" viewBox="0 0 24 24">
+                <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-6.5 0-10-8-10-8a18.45 18.45 0 0 1 5.06-5.94"/>
+                <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c6.5 0 10 8 10 8a18.5 18.5 0 0 1-2.16 3.19"/>
+                <line x1="1" y1="1" x2="23" y2="23"/>
+              </svg>
+            </button>
+          </div>
           {% if form.password.errors %}
             {% for e in form.password.errors %}<div class="form-error">{{ e }}</div>{% endfor %}
           {% endif %}
         </div>
 
-        <button type="submit" class="submit-btn">Sign In →</button>
+        <!-- Remember me -->
+        <div class="remember-row">
+          <input type="checkbox" id="remember_me" name="remember_me">
+          <label for="remember_me">Remember me</label>
+        </div>
+
+        <button type="submit" class="submit-btn"><span>Sign In →</span></button>
+
       </form>
 
-      <a href="{{ url_for('main.landing') }}" class="back-link">← Back to home</a>
+      <a href="{{ url_for('main.landing') }}" class="back-link">
+        <svg viewBox="0 0 24 24"><path d="M19 12H5M5 12l7-7M5 12l7 7"/></svg>
+        Back to home
+      </a>
+
     </div>
   </div>
+
+  <script>
+    const btn = document.getElementById('togglePassword');
+    const pwd = document.getElementById('password');
+    btn.addEventListener('click', () => {
+      const showing = pwd.type === 'text';
+      pwd.type = showing ? 'password' : 'text';
+      btn.classList.toggle('is-visible', !showing);
+      btn.setAttribute('aria-label', showing ? 'Show password' : 'Hide password');
+    });
+  </script>
 
 </body>
 </html>
