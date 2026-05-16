@@ -11,27 +11,125 @@
 </head>
 <body>
 
-<!-- SIDEBAR -->
+<!-- ── SIDEBAR ── -->
 <aside class="sidebar">
+
   <div class="sidebar-brand">
+    <div class="sidebar-logo">
+      <svg class="sidebar-logo-svg" viewBox="0 0 160 160" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Tracify logo mark">
+        <defs>
+          <radialGradient id="vl-pinGrad" cx="38%" cy="22%" r="70%">
+            <stop offset="0%" stop-color="#4d8fff"/>
+            <stop offset="100%" stop-color="#0028cc"/>
+          </radialGradient>
+          <radialGradient id="vl-faceGrad" cx="40%" cy="30%" r="70%">
+            <stop offset="0%" stop-color="#ddeeff"/>
+            <stop offset="100%" stop-color="#aaccff"/>
+          </radialGradient>
+          <radialGradient id="vl-glowRad" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stop-color="#1a6fff" stop-opacity="0.35"/>
+            <stop offset="100%" stop-color="#1a6fff" stop-opacity="0"/>
+          </radialGradient>
+          <filter id="vl-glow">
+            <feGaussianBlur stdDeviation="5" result="blur"/>
+            <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+          </filter>
+          <clipPath id="vl-faceClip">
+            <circle cx="80" cy="52" r="27"/>
+          </clipPath>
+        </defs>
+        <ellipse cx="80" cy="80" rx="68" ry="68" fill="url(#vl-glowRad)"/>
+        <ellipse cx="80" cy="132" rx="16" ry="5" fill="none" stroke="#0066ff" stroke-width="1.2" opacity="0.55"/>
+        <ellipse cx="80" cy="132" rx="26" ry="8" fill="none" stroke="#0066ff" stroke-width="0.8" opacity="0.3"/>
+        <ellipse cx="80" cy="132" rx="38" ry="11" fill="none" stroke="#00aaff" stroke-width="0.6" opacity="0.15"/>
+        <circle cx="80" cy="132" r="16" fill="none" stroke="#00ccff" stroke-width="1" opacity="0.4">
+          <animate attributeName="r" values="16;36;16" dur="3.5s" repeatCount="indefinite"/>
+          <animate attributeName="opacity" values="0.45;0.0;0.45" dur="3.5s" repeatCount="indefinite"/>
+        </circle>
+        <ellipse cx="80" cy="133" rx="22" ry="6" fill="#001a88" opacity="0.3" filter="url(#vl-glow)"/>
+        <path d="M80 14 C57 14 38 33 38 56 C38 87 80 130 80 130 C80 130 122 87 122 56 C122 33 103 14 80 14 Z" fill="url(#vl-pinGrad)"/>
+        <path d="M52 26 C40 38 36 52 38 64 C39 52 44 36 58 26 Z" fill="white" opacity="0.12"/>
+        <circle cx="80" cy="52" r="28" fill="url(#vl-faceGrad)"/>
+        <circle cx="80" cy="52" r="28" fill="none" stroke="rgba(0,180,255,0.25)" stroke-width="1"/>
+        <g clip-path="url(#vl-faceClip)">
+          <circle cx="80" cy="44" r="10" fill="#1448e8"/>
+          <path d="M56 80 Q56 62 67 57 Q73 54 80 54 Q87 54 93 57 Q104 62 104 80 Z" fill="#1448e8"/>
+        </g>
+        <path d="M80 24 A28 28 0 0 1 106 40" fill="none" stroke="#00d4ff" stroke-width="4.5" stroke-linecap="round" filter="url(#vl-glow)"/>
+        <path d="M106 40 A28 28 0 0 1 108 52" fill="none" stroke="#00d4ff" stroke-width="3" stroke-linecap="round" opacity="0.45"/>
+        <circle cx="114" cy="135" r="3.5" fill="#00ccff" opacity="0.7"/>
+        <circle cx="124" cy="137" r="2.6" fill="#00ccff" opacity="0.45"/>
+        <circle cx="133" cy="139" r="1.8" fill="#00ccff" opacity="0.25"/>
+      </svg>
+    </div>
     <div class="wordmark">TRACI<span>FY</span></div>
     <p>Monitoring System</p>
   </div>
-  <div class="sidebar-role">{{ 'Administrator' if current_user.role == 'admin' else 'Security Personnel' }}</div>
+
+  <div class="sidebar-role">
+    {{ 'Administrator' if current_user.role == 'admin' else 'Security Personnel' }}
+  </div>
+
   <ul class="sidebar-nav">
     {% if current_user.role == 'admin' %}
-    <li><a href="{{ url_for('admin.dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
-    <li><a href="{{ url_for('admin.visitors') }}" class="active"><span class="nav-icon">👤</span> Visitor Records</a></li>
-    <li><a href="{{ url_for('admin.personnel') }}"><span class="nav-icon">🛡</span> Personnel</a></li>
-    <li><a href="{{ url_for('admin.tasks') }}"><span class="nav-icon">✓</span> Tasks</a></li>
-    <li><a href="{{ url_for('admin.assign_task') }}"><span class="nav-icon">＋</span> Assign Task</a></li>
+    <li>
+      <a href="{{ url_for('admin.dashboard') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.visitors') }}" class="active">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+        Visitor Records
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.personnel') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span>
+        Personnel
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.tasks') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        Tasks
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('admin.assign_task') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></span>
+        Assign Task
+      </a>
+    </li>
     {% else %}
-    <li><a href="{{ url_for('security.dashboard') }}"><span class="nav-icon">⊞</span> Dashboard</a></li>
-    <li><a href="{{ url_for('security.visitor_logs') }}" class="active"><span class="nav-icon">📋</span> Visitor Logs</a></li>
-    <li><a href="{{ url_for('security.log_visitor') }}"><span class="nav-icon">＋</span> Log Visitor</a></li>
-    <li><a href="{{ url_for('security.my_tasks') }}"><span class="nav-icon">✓</span> My Tasks</a></li>
+    <li>
+      <a href="{{ url_for('security.dashboard') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg></span>
+        Dashboard
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.visitor_logs') }}" class="active">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="16" x2="13" y2="16"/></svg></span>
+        Visitor Logs
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.log_visitor') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="19" y1="8" x2="19" y2="14"/><line x1="16" y1="11" x2="22" y2="11"/></svg></span>
+        Log Visitor
+      </a>
+    </li>
+    <li>
+      <a href="{{ url_for('security.my_tasks') }}">
+        <span class="nav-icon"><svg viewBox="0 0 24 24"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
+        My Tasks
+      </a>
+    </li>
     {% endif %}
   </ul>
+
   <div class="sidebar-footer">
     <div class="user-chip">
       <div class="avatar">{{ current_user.username[0].upper() }}</div>
@@ -40,27 +138,41 @@
         <div class="role-tag">{{ 'Administrator' if current_user.role == 'admin' else 'Security Personnel' }}</div>
       </div>
     </div>
-    <a href="{{ url_for('auth.logout') }}" class="logout-btn">⏻ Sign Out</a>
+    <a href="{{ url_for('auth.logout') }}" class="logout-btn">
+      <svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Sign Out
+    </a>
   </div>
+
 </aside>
 
+<!-- ── MAIN ── -->
 <div class="main">
+
   <header class="topbar">
     <div class="topbar-title">Visitor Records</div>
+
     <form method="GET" style="display:flex;flex:1;max-width:380px;margin:0 auto;">
       <div class="search-bar" style="width:100%">
-        <span class="search-icon">🔍</span>
-        <input type="text" name="q" placeholder="Search by name, contact, purpose..." value="{{ query or '' }}">
+        <span class="search-icon">
+          <svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+        </span>
+        <input type="text" name="q" placeholder="Search by name, contact, purpose…" value="{{ query or '' }}">
       </div>
     </form>
+
     {% if current_user.role == 'security' %}
     <div class="topbar-actions">
-      <a href="{{ url_for('security.log_visitor') }}" class="btn btn-primary">＋ Log Visitor</a>
+      <a href="{{ url_for('security.log_visitor') }}" class="btn btn-primary">
+        <svg viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        Log Visitor
+      </a>
     </div>
     {% endif %}
   </header>
 
   <div class="content">
+
     {% with messages = get_flashed_messages(with_categories=true) %}
       {% for category, message in messages %}
         <div class="flash flash-{{ category }}">{{ message }}</div>
@@ -69,10 +181,9 @@
 
     <div class="section-header">
       <div class="section-title">
-        All Visitor Logs
-        {% if query %} — Results for "{{ query }}"{% endif %}
+        All Visitor Logs{% if query %} — "{{ query }}"{% endif %}
       </div>
-      <span style="font-size:.75rem;color:var(--muted)">{{ logs|length }} record(s)</span>
+      <span class="record-count">{{ logs|length }} record{{ 's' if logs|length != 1 }}</span>
     </div>
 
     <div class="table-wrap">
@@ -95,7 +206,7 @@
         <tbody>
           {% for log in logs %}
           <tr>
-            <td style="color:var(--muted)">{{ log.visitor_log_id }}</td>
+            <td>{{ log.visitor_log_id }}</td>
             <td>{{ log.visitor.first_name }} {{ log.visitor.last_name }}</td>
             <td>{{ log.visitor.contact_number }}</td>
             <td>{{ log.visitor.email or '—' }}</td>
@@ -108,7 +219,7 @@
             <td>
               {% if log.status == 'active' %}
               <form method="POST" action="{{ url_for('security.checkout_visitor', log_id=log.visitor_log_id) }}">
-              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                 <button type="submit" class="btn btn-outline btn-sm">Check Out</button>
               </form>
               {% endif %}
@@ -120,13 +231,16 @@
       </table>
       {% else %}
       <div class="empty-state">
-        <div class="empty-icon">📋</div>
+        <div class="empty-icon">
+          <svg viewBox="0 0 24 24"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>
+        </div>
         {% if query %}No records matching "{{ query }}"{% else %}No visitor logs recorded yet{% endif %}
       </div>
       {% endif %}
     </div>
+
   </div>
 </div>
 
 </body>
-</html>
+</html>A
